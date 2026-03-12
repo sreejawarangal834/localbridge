@@ -1,50 +1,38 @@
 # LocalBridge
 
-LocalBridge is a localized job search and recruitment platform designed specifically for the unorganized sector. It connects local job seekers with nearby employers (retail shops, medical stores, warehouses, delivery, etc.) quickly and easily, facilitating direct communication via WhatsApp.
+LocalBridge is a Local Job Discovery Platform designed to connect job seekers with opportunities in their local communities and regional areas. The platform provides a streamlined experience for all applicants.
 
-![LocalBridge Application](public/vite.svg) <!-- Replace with a real screenshot of your app if you have one -->
+##  Features
 
-## Features
+### For Job Seekers
+* **Location-Based Search**: Find jobs near your locality effortlessly.
+* **Multi-language Support**: Use the platform in your preferred local language.
+* **Quick Apply**: Apply to jobs with a single tap.
+* **WhatsApp Integration**: Receive job alerts and updates directly on WhatsApp.
+* **Eligibility Check System**: Automatically matches your profile with job requirements to show your eligibility status.
 
-- **Multilingual Support**: Fully localized in English, Telugu, and Hindi to ensure accessibility for all local users.
-- ** Role-Based Workflows**: Separate, tailored experiences seamlessly designed for both Job Seekers and Employers.
-- ** Smart Job Discovery**: 
-  - Browse jobs by category (Retail, Medical, Delivery, Manufacturing, etc.).
-  - Interactive Map integration to find jobs based on their exact physical locations.
-  - Voice search functionality for ease of use.
-- ** Quick Apply**: Apply to jobs with a single click or connect instantly with employers via a direct WhatsApp bridge.
-- ** Employer Dashboard**: Post new jobs in under 2 minutes, manage applications, and track active job views.
-- **Safety First**: Built-in safety guidelines, user verification, and reporting mechanisms for suspicious job postings.
-- **Verification System**: Multi-level employer verification (Phone, Business Details, Documents) to build trust and credibility.
+### For Employers
+* **Simple Job Posting**: Easy-to-use form to post new job openings in minutes.
+* **Employer Dashboard**: Manage job listings and review applications efficiently.
+* **Direct Communication**: Connect quickly with potential hires.
 
-## Tech Stack
+##  Technology Stack
+* **Frontend**: React, Navigation & Routing, Multilingual Support (i18n)
+* **Backend**: Node.js, Express, Prisma ORM, SQLite
+* **Authentication**: JSON Web Tokens (JWT) & bcrypt
+* **UI/UX**: Responsive design tailored for mobile devices in local communities.
 
-### Frontend
-- **React.js** (built with Vite for fast HMR)
-- **Tailwind CSS** for responsive, modern, and beautiful UI
-- **React Router** for declarative routing
-- **React Leaflet** for geospatial map integration
-- **i18next** for internationalization (i18n)
-- **Lucide React** for beautiful, consistent icons
-- **Vite** as the frontend tooling and bundler
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher recommended)
-- npm or yarn
-
-### Installation
+##  Setting Up the Project
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/sreejawarangal834/localbridge.git
+   git clone <repository-url>
    ```
 2. Navigate to the project directory:
    ```bash
-   cd localbridge
+   cd LocalBridge1
    ```
-3. Install frontend dependencies:
+3. Install dependencies:
    ```bash
    npm install
    ```
@@ -53,8 +41,17 @@ LocalBridge is a localized job search and recruitment platform designed specific
    npm run dev
    ```
 
-## Contributing
-Contributions are always welcome! Please feel free to submit a Pull Request.
+## Authentication & Profiles
 
-## License
-This project is licensed under the MIT License.
+The platform includes built-in authentication forms (login/signup) tailored to capture the necessary details without overwhelming the user. Seeker profiles capture qualifications and occupations to accurately determine job eligibility.
+
+## Contributing
+
+We welcome contributions! Please follow these steps to contribute:
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+ 
