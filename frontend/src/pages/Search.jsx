@@ -7,6 +7,7 @@ import QuickApplyModal from '../components/ui/QuickApplyModal';
 import SafetyBanner from '../components/ui/SafetyBanner';
 import useVoiceSearch from '../hooks/useVoiceSearch';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 
 // Fix for default marker icons in React Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -20,8 +21,15 @@ export default function Search() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Advanced Filters
+  const [salaryFilter, setSalaryFilter] = useState("Any");
+  const [experienceFilter, setExperienceFilter] = useState("Any");
+  const [jobTypeFilter, setJobTypeFilter] = useState("Any");
+
   const [mapCenter, setMapCenter] = useState([17.9689, 79.5941]); // Default to Warangal
   const [zoom, setZoom] = useState(13);
 
@@ -43,7 +51,7 @@ export default function Search() {
 
   useEffect(() => {
     fetchJobs();
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, salaryFilter, experienceFilter, jobTypeFilter]);
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -53,7 +61,45 @@ export default function Search() {
       if (searchQuery) url += `search=${searchQuery}`;
       
       const res = await fetch(url);
-      const data = await res.json();
+      let data = await res.json();
+      
+      if (user && user.role === 'SEEKER') {
+        data.sort((a, b) => {
+          let scoreA = 0;
+          let scoreB = 0;
+          
+          if (user.occupation && a.title.toLowerCase().includes(user.occupation.toLowerCase())) scoreA += 2;
+          if (user.address && a.location && a.location.toLowerCase().includes(user.address.toLowerCase())) scoreA += 1;
+          
+          if (user.occupation && b.title.toLowerCase().includes(user.occupation.toLowerCase())) scoreB += 2;
+          if (user.address && b.location && b.location.toLowerCase().includes(user.address.toLowerCase())) scoreB += 1;
+          
+          return scoreB - scoreA;
+        });
+      }
+
+      // Apply Advanced Client-Side Filters
+      if (salaryFilter !== "Any") {
+        data = data.filter(job => {
+          if (!job.salary) return false;
+          const numMatch = job.salary.match(/(\d+)/g);
+          if (!numMatch) return false;
+          const val = Math.max(...numMatch.map(Number));
+          if (salaryFilter === "Under ₹10k") return val < 10000;
+          if (salaryFilter === "₹10k - ₹20k") return val >= 10000 && val <= 20000;
+          if (salaryFilter === "Above ₹20k") return val > 20000;
+          return true;
+        });
+      }
+      
+      if (experienceFilter !== "Any") {
+        data = data.filter(job => job.minExperience === experienceFilter);
+      }
+
+      if (jobTypeFilter !== "Any") {
+         data = data.filter(job => job.workingHours && job.workingHours.toLowerCase().includes(jobTypeFilter.toLowerCase()));
+      }
+
       setJobs(data);
     } catch (err) {
       console.error("Error fetching jobs:", err);
@@ -83,6 +129,22 @@ export default function Search() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Welcome Message */}
+      {user && (
+        <div className="mb-6 bg-gradient-to-r from-blue-600 to-orange-500 rounded-2xl p-6 text-white">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome, {user.name}! 👋</h1>
+          <p className="text-blue-50">
+            {user.occupation && user.address 
+              ? `We've found jobs matching your profile: ${user.occupation} in ${user.address}`
+              : user.occupation 
+              ? `Showing jobs for ${user.occupation}`
+              : user.address
+              ? `Showing jobs near ${user.address}`
+              : 'Explore job opportunities near you'}
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <h1 className="text-2xl font-bold text-gray-900">{t('find_local_job')}</h1>
         
@@ -115,26 +177,94 @@ export default function Search() {
         <div className="lg:col-span-4 flex flex-col gap-6 overflow-hidden">
           {/* Categories */}
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 shrink-0">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-4 h-4 text-blue-600" />
-              <h2 className="font-bold text-gray-900">{t('categories')}</h2> {/* Localized category header */}
-            </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-blue-600" />
+                <h2 className="font-bold text-gray-900">{t('filters') || 'Filters'}</h2>
+              </div>
               <button 
-                onClick={() => setActiveCategory("All")} // Changed to setActiveCategory
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCategory === "All" ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                onClick={() => {
+                  setActiveCategory("All");
+                  setSalaryFilter("Any");
+                  setExperienceFilter("Any");
+                  setJobTypeFilter("Any");
+                }}
+                className="text-xs text-blue-600 font-bold hover:underline"
               >
-                {t('all_categories')} {/* Localized "All" */}
+                Clear All
               </button>
-              {categories.filter(cat => cat.id !== "All").map(cat => ( // Filter out "All" as it's handled above
-                <button 
-                  key={cat.id} // Changed key to cat.id
-                  onClick={() => setActiveCategory(cat.id)} // Changed to setActiveCategory(cat.id)
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                >
-                  {cat.label} {/* Use cat.label for display */}
-                </button>
-              ))}
+            </div>
+            
+            <div className="space-y-4">
+              {/* Category */}
+              <div>
+                <label className="text-xs font-bold text-gray-500 mb-2 block uppercase">{t('categories')}</label>
+                <div className="flex flex-wrap gap-2">
+                  <button 
+                    onClick={() => setActiveCategory("All")}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCategory === "All" ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  >
+                    {t('all_categories')}
+                  </button>
+                  {categories.filter(cat => cat.id !== "All").map(cat => (
+                    <button 
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                {/* Salary Filter */}
+                <div>
+                  <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">Salary</label>
+                  <select 
+                    value={salaryFilter}
+                    onChange={(e) => setSalaryFilter(e.target.value)}
+                    className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-blue-500 bg-white"
+                  >
+                    <option value="Any">Any</option>
+                    <option value="Under ₹10k">Under ₹10k</option>
+                    <option value="₹10k - ₹20k">₹10k - ₹20k</option>
+                    <option value="Above ₹20k">Above ₹20k</option>
+                  </select>
+                </div>
+
+                {/* Experience */}
+                <div>
+                  <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">Experience</label>
+                  <select 
+                    value={experienceFilter}
+                    onChange={(e) => setExperienceFilter(e.target.value)}
+                    className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-blue-500 bg-white"
+                  >
+                    <option value="Any">Any</option>
+                    <option value="Not Needed">Not Needed</option>
+                    <option value="Fresher">Fresher</option>
+                    <option value="6 Months+">6 Months+</option>
+                    <option value="1 Year+">1 Year+</option>
+                    <option value="2 Years+">2 Years+</option>
+                  </select>
+                </div>
+
+                {/* Job Type (Full/Part time) */}
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">Job Type</label>
+                  <select 
+                    value={jobTypeFilter}
+                    onChange={(e) => setJobTypeFilter(e.target.value)}
+                    className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-blue-500 bg-white"
+                  >
+                    <option value="Any">Any (Full Time & Part Time)</option>
+                    <option value="Full Time">Full Time</option>
+                    <option value="Part Time">Part Time</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
 

@@ -20,6 +20,7 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/jobs', require('./routes/jobRoutes'));
 app.use('/api/applications', require('./routes/applicationRoutes'));
 app.use('/api/profiles', require('./routes/businessProfileRoutes'));
+app.use('/api/seeker-profile', require('./routes/seekerProfileRoutes'));
 app.use('/api/trust', require('./routes/moderationRoutes'));
 
 // Basic Error Handler

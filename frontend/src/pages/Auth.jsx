@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { User, Lock, Phone, Briefcase, Mail, ShieldCheck } from 'lucide-react';
+import { User, Lock, Phone, Briefcase, Mail, ShieldCheck, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Auth() {
@@ -15,7 +15,9 @@ export default function Auth() {
     email: '',
     businessType: 'Retail',
     qualification: 'Not Needed',
-    occupation: ''
+    occupation: '',
+    roleInBusiness: '',
+    address: ''
   });
   const [errors, setErrors] = useState({});
   const { login } = useAuth();
@@ -54,7 +56,9 @@ export default function Auth() {
       phone: formData.phone,
       role: role,
       qualification: formData.qualification,
-      occupation: formData.occupation
+      occupation: formData.occupation,
+      roleInBusiness: role === 'EMPLOYER' ? formData.roleInBusiness : undefined,
+      address: formData.address
     };
 
     login(userData);
@@ -167,6 +171,22 @@ export default function Auth() {
             </div>
           )}
 
+          {!isLogin && (
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Address</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-300" />
+                <input 
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-gray-100 rounded-xl outline-none focus:border-blue-500 transition"
+                  placeholder="Street, City, Area"
+                  value={formData.address}
+                  onChange={e => setFormData({...formData, address: e.target.value})}
+                />
+              </div>
+            </div>
+          )}
+
           {!isLogin && role === 'SEEKER' && (
             <div className="grid grid-cols-1 gap-4">
               <div>
@@ -209,6 +229,22 @@ export default function Auth() {
                 />
               </div>
               {errors.shopName && <p className="text-[10px] text-red-500 mt-1 ml-1">{errors.shopName}</p>}
+            </div>
+          )}
+
+          {!isLogin && role === 'EMPLOYER' && (
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Role in Business</label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 w-5 h-5 text-gray-300" />
+                <input 
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-gray-100 rounded-xl outline-none focus:border-blue-500 transition"
+                  placeholder="e.g. Owner, Manager"
+                  value={formData.roleInBusiness}
+                  onChange={e => setFormData({...formData, roleInBusiness: e.target.value})}
+                />
+              </div>
             </div>
           )}
 

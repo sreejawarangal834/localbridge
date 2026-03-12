@@ -25,6 +25,18 @@ model User {
   updatedAt    DateTime      @updatedAt
   jobsPosted   Job[]         @relation("EmployerJobs")
   applications Application[]
+  seekerProfile SeekerProfile?
+}
+
+model SeekerProfile {
+  id             String  @id @default(uuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id])
+  resumeUrl      String?
+  skills         String?
+  portfolioUrl   String?
+  experienceYears Int?   @default(0)
+  alertsEnabled  Boolean @default(false)
 }
 
 model BusinessProfile {

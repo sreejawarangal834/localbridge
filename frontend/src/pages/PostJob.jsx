@@ -93,6 +93,16 @@ export default function PostJob() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Welcome Message */}
+      {user && (
+        <div className="mb-6 bg-gradient-to-r from-blue-600 to-orange-500 rounded-2xl p-6 text-white">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome, {user.name}! 👋</h1>
+          <p className="text-blue-50">
+            Post a job and connect with talented local workers in your area.
+          </p>
+        </div>
+      )}
+
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('post_job_title')}</h1>
         <p className="text-gray-500 mb-8">{t('post_job_subtitle')}</p>

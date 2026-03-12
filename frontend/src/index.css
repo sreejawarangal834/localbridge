@@ -6,6 +6,32 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 text-gray-900 font-sans;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-200 font-semibold py-3 px-6 rounded-xl transition-all active:scale-95;
+  }
+  
+  .btn-success {
+    @apply bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md shadow-green-500/20 transition-all active:scale-95;
+  }
+  
+  .card-glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg shadow-gray-100/50;
+  }
+  
+  .card-shadow {
+    @apply bg-white rounded-2xl shadow-lg shadow-gray-100/60 border border-gray-100;
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-orange-500;
   }
 }
